@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { SVGProps } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 
 type Props = {
@@ -113,6 +114,10 @@ export default function AssistiveTouch({ onSendSeq, onFocusXterm }: Props) {
     ? { top, left: 8, right: "auto" as const }
     : { top, right: 8, left: "auto" as const };
 
+  const closeKeyboard = useCallback(() => {
+    setOpen(false);
+  }, []);
+
   const onOpenChange = (v: boolean) => {
     setOpen(v);
     if (!v) {
@@ -188,12 +193,39 @@ export default function AssistiveTouch({ onSendSeq, onFocusXterm }: Props) {
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
           <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(560px,calc(100vw-2rem))] max-h-[min(80vh,700px)] overflow-auto rounded-xl border border-neutral-700 bg-neutral-900 text-neutral-50 p-4 shadow-xl">
-            <Dialog.Title className="font-bold mb-2">
-              Terminal Helpers
-            </Dialog.Title>
-            <Dialog.Description className="opacity-90 mb-3">
-              Quick-access keys for the active SSH session.
-            </Dialog.Description>
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div>
+                <Dialog.Title className="font-bold">
+                  Terminal Helpers
+                </Dialog.Title>
+                <Dialog.Description className="opacity-90 mt-1">
+                  Quick-access keys for the active SSH session.
+                </Dialog.Description>
+              </div>
+              <button
+                type="button"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-neutral-700 bg-neutral-800 text-neutral-100 hover:bg-neutral-700"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={closeKeyboard}
+                aria-label="Hide helper keyboard"
+                title="Hide helper keyboard"
+              >
+                <ArrowDownIcon className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="flex justify-center mb-4">
+              <button
+                type="button"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-neutral-700 bg-neutral-800 text-neutral-100 shadow-sm hover:bg-neutral-700"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={closeKeyboard}
+                aria-label="Minimize helper keyboard"
+                title="Minimize helper keyboard"
+              >
+                <ArrowDownIcon className="h-5 w-5" />
+              </button>
+            </div>
 
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
               <KeyButton label="Tab" onClick={() => sendKey(KEY_SEQ.Tab)} />
@@ -228,7 +260,8 @@ export default function AssistiveTouch({ onSendSeq, onFocusXterm }: Props) {
             <div className="flex justify-end mt-4">
               <button
                 className="px-3 py-2 rounded-md border border-neutral-700 bg-transparent hover:bg-neutral-800"
-                onClick={() => setOpen(false)}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={closeKeyboard}
               >
                 Close
               </button>
@@ -237,6 +270,22 @@ export default function AssistiveTouch({ onSendSeq, onFocusXterm }: Props) {
         </Dialog.Portal>
       </Dialog.Root>
     </>
+  );
+}
+
+function ArrowDownIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
   );
 }
 
