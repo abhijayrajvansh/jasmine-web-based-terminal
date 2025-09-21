@@ -1,5 +1,11 @@
 # Architecture Overview
 
+## Project Overview
+
+This project is a web-based SSH terminal built with Next.js, TypeScript, and Tailwind CSS. It uses xterm.js for the terminal interface and a custom WebSocket server to bridge the connection to an SSH server. The application allows users to connect to an SSH server from their web browser.
+
+The frontend is a Next.js application that provides the terminal UI. The backend is a simple Node.js server that uses the `ssh2` library to create an SSH client and `ws` to create a WebSocket server. The frontend and backend communicate over WebSockets.
+
 ## High-Level Flow
 Users land on the credential form at `src/app/page.tsx`. When the form is submitted the browser opens a WebSocket to the local bridge (`ws://<host>:3001` by default), requests an SSH credential test, and on success stores the session config in `sessionStorage` before redirecting to `/terminal`. The terminal page rehydrates the config, boots an `xterm.js` instance, and reuses the same WebSocket connection to proxy terminal input/output between the browser and the SSH host.
 
