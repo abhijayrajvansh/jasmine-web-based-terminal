@@ -291,25 +291,24 @@ export default function TerminalPage() {
     const vv = window.visualViewport;
     if (!vv) return;
 
+    const KEYBOARD_THRESHOLD = 120;
     let keyboardVisible = false;
     let raf = 0;
 
     const syncViewport = () => {
       raf = 0;
-      const difference = window.innerHeight - vv.height - vv.offsetTop;
-      const nowVisible = difference > 120;
+      const difference = window.innerHeight - (vv.height + vv.offsetTop);
+      const nowVisible = difference > KEYBOARD_THRESHOLD;
 
-      if (nowVisible) {
-        if (!keyboardVisible) {
-          keyboardVisible = true;
-        }
+      if (nowVisible && !keyboardVisible) {
+        keyboardVisible = true;
         try {
           fitRef.current?.fit();
         } catch {}
         try {
           termRef.current?.scrollToBottom();
         } catch {}
-      } else if (keyboardVisible) {
+      } else if (!nowVisible && keyboardVisible) {
         keyboardVisible = false;
         try {
           fitRef.current?.fit();
