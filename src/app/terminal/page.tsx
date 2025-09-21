@@ -334,21 +334,7 @@ export default function TerminalPage() {
 
   return (
     <div className="flex flex-col overflow-hidden h-[var(--app-viewport-height)]">
-      <div className="sticky top-0 z-10 flex items-center gap-2 px-4 py-3 border-b border-neutral-700/60 bg-neutral-900">
-        <span className="grow" />
-        <button
-          type="button"
-          className="px-3 py-1 rounded-md border border-neutral-700 bg-neutral-800 text-neutral-100 hover:bg-neutral-700"
-          onClick={sendTab}
-          onMouseDown={(e) => {
-            // Prevent the button from taking focus; keep focus on terminal
-            e.preventDefault();
-          }}
-          aria-label="Send Tab to terminal"
-          title="Send Tab"
-        >
-          Tab
-        </button>
+      <div className="sticky top-0 z-10 flex items-center justify-end gap-2 px-4 py-3 border-b border-neutral-700/60 bg-neutral-900">
         <button
           type="button"
           className="px-3 py-1 rounded-md border border-red-600 bg-red-500 text-white hover:bg-red-400"
