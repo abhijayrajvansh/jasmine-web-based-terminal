@@ -334,7 +334,12 @@ export default function TerminalPage() {
 
   return (
     <div className="flex flex-col overflow-hidden h-[var(--app-viewport-height)]">
-      <div className="sticky top-0 z-10 flex items-center justify-end gap-2 px-4 py-3 border-b border-neutral-700/60 bg-neutral-900">
+      <div className="sticky top-0 z-10 h-0" />
+      <div className="flex-1 overflow-hidden bg-[#0a0a0a]" ref={containerRef} />
+      <div className="sticky bottom-0 z-10 flex items-center justify-between gap-3 px-4 py-3 border-t border-neutral-700/60 bg-neutral-900">
+        <div className="flex items-center gap-2">
+          <strong>Status:</strong> {status}
+        </div>
         <button
           type="button"
           className="px-3 py-1 rounded-md border border-red-600 bg-red-500 text-white hover:bg-red-400"
@@ -342,12 +347,6 @@ export default function TerminalPage() {
         >
           Disconnect
         </button>
-      </div>
-      <div className="flex-1 overflow-hidden bg-[#0a0a0a]" ref={containerRef} />
-      <div className="sticky bottom-0 z-10 flex items-center gap-2 px-4 py-3 border-t border-neutral-700/60 bg-neutral-900">
-        <div>
-          <strong>Status:</strong> {status}
-        </div>
       </div>
       <AssistiveTouch onSendSeq={sendSeq} onFocusXterm={focusXtermSoon} />
       <ConfirmReloadDialog
