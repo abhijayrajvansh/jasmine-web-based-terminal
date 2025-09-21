@@ -3,6 +3,7 @@
 :root {
   --background: #0a0a0a;
   --foreground: #ededed;
+  --app-viewport-height: 100vh;
 }
 
 @theme inline {
@@ -10,7 +11,18 @@
   --color-foreground: var(--foreground);
 }
 
-body { background: var(--background); color: var(--foreground); }
+body {
+  background: var(--background);
+  color: var(--foreground);
+  overflow: hidden;
+}
+
+.wrapper {
+  height: var(--app-viewport-height);
+  min-height: var(--app-viewport-height);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
 /* Ensure xterm fills the available area and uses its own scrollbar */
 .xterm, .xterm-viewport, .xterm-screen { height: 100% !important; }
