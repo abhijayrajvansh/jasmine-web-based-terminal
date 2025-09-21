@@ -11,7 +11,7 @@ export default function HomePage() {
   const [port, setPort] = useState(22);
   const [username, setUsername] = useState("abhijayrajvansh");
   const [authMethod, setAuthMethod] = useState<AuthMethod>("password");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("abhi8709247743");
   const [privateKey, setPrivateKey] = useState("");
   const [passphrase, setPassphrase] = useState("");
   const [connecting, setConnecting] = useState(false);
