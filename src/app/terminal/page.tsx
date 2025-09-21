@@ -286,6 +286,53 @@ export default function TerminalPage() {
     };
   }, [router]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    let keyboardVisible = false;
+    let raf = 0;
+
+    const syncViewport = () => {
+      raf = 0;
+      const difference = window.innerHeight - vv.height - vv.offsetTop;
+      const nowVisible = difference > 120;
+
+      if (nowVisible) {
+        if (!keyboardVisible) {
+          keyboardVisible = true;
+        }
+        try {
+          fitRef.current?.fit();
+        } catch {}
+        try {
+          termRef.current?.scrollToBottom();
+        } catch {}
+      } else if (keyboardVisible) {
+        keyboardVisible = false;
+        try {
+          fitRef.current?.fit();
+        } catch {}
+      }
+    };
+
+    const schedule = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(syncViewport);
+    };
+
+    schedule();
+    vv.addEventListener("resize", schedule);
+    vv.addEventListener("scroll", schedule);
+
+    return () => {
+      if (raf) window.cancelAnimationFrame(raf);
+      vv.removeEventListener("resize", schedule);
+      vv.removeEventListener("scroll", schedule);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col overflow-hidden h-[var(--app-viewport-height)]">
       <div className="sticky top-0 z-10 flex items-center gap-2 px-4 py-3 border-b border-neutral-700/60 bg-neutral-900">
