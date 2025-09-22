@@ -71,11 +71,16 @@ export default function TerminalPage() {
       const { FitAddon } = await import("xterm-addon-fit");
       await import("xterm/css/xterm.css");
 
+      const getResponsiveFontSize = () => {
+        if (typeof window === "undefined") return 12;
+        return window.matchMedia("(max-width: 767px)").matches ? 10 : 12;
+      };
+
       term = new Terminal({
         cursorBlink: true,
         convertEol: true,
         fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-        fontSize: 12,
+        fontSize: getResponsiveFontSize(),
         fontWeight: 600,
         scrollback: 1000,
         theme: {
@@ -106,8 +111,18 @@ export default function TerminalPage() {
       term.loadAddon(fit);
       termRef.current = term;
       fitRef.current = fit;
+
+      const applyResponsiveFontSize = () => {
+        if (!term) return;
+        const targetFontSize = getResponsiveFontSize();
+        const currentFontSize = term.options.fontSize ?? targetFontSize;
+        if (currentFontSize === targetFontSize) return;
+        term.options.fontSize = targetFontSize;
+      };
+
       if (containerRef.current) {
         term.open(containerRef.current);
+        applyResponsiveFontSize();
         // Use setTimeout to ensure DOM is ready before fitting
         setTimeout(() => {
           try {
@@ -116,6 +131,7 @@ export default function TerminalPage() {
         }, 100);
         if ("ResizeObserver" in window) {
           ro = new ResizeObserver(() => {
+            applyResponsiveFontSize();
             try {
               fit.fit();
             } catch {}
@@ -215,6 +231,7 @@ export default function TerminalPage() {
       });
 
       const handleResize = () => {
+        applyResponsiveFontSize();
         try {
           fit.fit();
         } catch {}
