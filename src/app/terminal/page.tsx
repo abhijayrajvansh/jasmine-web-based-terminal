@@ -18,6 +18,7 @@ export default function TerminalPage() {
   const [confirmDisconnectOpen, setConfirmDisconnectOpen] = useState(false);
   const allowUnloadRef = useRef(false);
   const readyRef = useRef(false);
+  const keyboardVisibleRef = useRef(false);
 
   const focusXtermSoon = () => {
     try {
@@ -65,6 +66,7 @@ export default function TerminalPage() {
     let term: any;
     let fit: any;
     let ro: ResizeObserver | null = null;
+    let removeContainerListeners: (() => void) | null = null;
 
     const init = async () => {
       const { Terminal } = await import("xterm");
@@ -121,7 +123,8 @@ export default function TerminalPage() {
       };
 
       if (containerRef.current) {
-        term.open(containerRef.current);
+        const container = containerRef.current;
+        term.open(container);
         applyResponsiveFontSize();
         // Use setTimeout to ensure DOM is ready before fitting
         setTimeout(() => {
@@ -145,8 +148,43 @@ export default function TerminalPage() {
               );
             } catch {}
           });
-          ro.observe(containerRef.current);
+          ro.observe(container);
         }
+
+        const handleFocusRequest = () => {
+          try {
+            term.scrollToBottom();
+          } catch {}
+          focusXtermSoon();
+        };
+
+        const listenerCleanups: Array<() => void> = [];
+
+        if (window.PointerEvent) {
+          container.addEventListener("pointerdown", handleFocusRequest);
+          listenerCleanups.push(() => {
+            container.removeEventListener("pointerdown", handleFocusRequest);
+          });
+        } else {
+          container.addEventListener("touchstart", handleFocusRequest, {
+            passive: true,
+          });
+          container.addEventListener("mousedown", handleFocusRequest);
+          listenerCleanups.push(() => {
+            container.removeEventListener("touchstart", handleFocusRequest);
+          });
+          listenerCleanups.push(() => {
+            container.removeEventListener("mousedown", handleFocusRequest);
+          });
+        }
+
+        removeContainerListeners = () => {
+          listenerCleanups.forEach((cleanup) => {
+            try {
+              cleanup();
+            } catch {}
+          });
+        };
       }
 
       // Build WS URL that works across LAN and cloud deployments.
@@ -275,6 +313,10 @@ export default function TerminalPage() {
           try {
             ro.disconnect();
           } catch {}
+        if (removeContainerListeners)
+          try {
+            removeContainerListeners();
+          } catch {}
         onData.dispose();
         onResize.dispose();
       };
@@ -309,7 +351,6 @@ export default function TerminalPage() {
     if (!vv) return;
 
     const KEYBOARD_THRESHOLD = 120;
-    let keyboardVisible = false;
     let raf = 0;
 
     const syncViewport = () => {
@@ -317,16 +358,18 @@ export default function TerminalPage() {
       const difference = window.innerHeight - (vv.height + vv.offsetTop);
       const nowVisible = difference > KEYBOARD_THRESHOLD;
 
-      if (nowVisible && !keyboardVisible) {
-        keyboardVisible = true;
+      const wasVisible = keyboardVisibleRef.current;
+
+      if (nowVisible && !wasVisible) {
+        keyboardVisibleRef.current = true;
         try {
           fitRef.current?.fit();
         } catch {}
         try {
           termRef.current?.scrollToBottom();
         } catch {}
-      } else if (!nowVisible && keyboardVisible) {
-        keyboardVisible = false;
+      } else if (!nowVisible && wasVisible) {
+        keyboardVisibleRef.current = false;
         try {
           fitRef.current?.fit();
         } catch {}
@@ -346,6 +389,7 @@ export default function TerminalPage() {
       if (raf) window.cancelAnimationFrame(raf);
       vv.removeEventListener("resize", schedule);
       vv.removeEventListener("scroll", schedule);
+      keyboardVisibleRef.current = false;
     };
   }, []);
 
