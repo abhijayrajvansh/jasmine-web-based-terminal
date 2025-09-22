@@ -13,7 +13,7 @@ The frontend is a Next.js application that provides the terminal UI. The backend
 - Always type‑check after any code change and fix all errors.
 
 ## Always After Changes (Mandatory)
-- Type check: run `pnpx tsc --noEmit`; resolve all errors.
+- Type check: run `pnpm exec tsc --noEmit`; resolve all errors.
 - Stage files: `git add <each_changed_file>` (no `-a`).
 - Commit: `git commit -m "feat: <6–7 word summary>"` (use correct type: feat/fix/docs/style/refactor/perf/test).
 - Push: `git push origin <CURRENT_BRANCH_NAME>` (push to the current branch on origin after every successful agent completion).
